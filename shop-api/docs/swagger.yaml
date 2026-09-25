@@ -1,0 +1,751 @@
+basePath: /api/v1
+definitions:
+  dto.AddressDTO:
+    properties:
+      city:
+        example: Moscow
+        maxLength: 100
+        minLength: 1
+        type: string
+      country:
+        example: Russia
+        maxLength: 100
+        minLength: 1
+        type: string
+      street:
+        example: Tverskaya 1
+        maxLength: 200
+        minLength: 1
+        type: string
+    required:
+    - city
+    - country
+    - street
+    type: object
+  dto.ClientResponse:
+    properties:
+      address:
+        $ref: '#/definitions/dto.AddressDTO'
+      birthday:
+        example: "1990-05-15"
+        type: string
+      client_name:
+        example: Ivan
+        type: string
+      client_surname:
+        example: Ivanov
+        type: string
+      gender:
+        example: male
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      registration_date:
+        example: "2024-01-01T12:00:00Z"
+        type: string
+    type: object
+  dto.CreateClientRequest:
+    properties:
+      address:
+        $ref: '#/definitions/dto.AddressDTO'
+      birthday:
+        example: "1990-05-15"
+        type: string
+      client_name:
+        example: Ivan
+        maxLength: 100
+        minLength: 1
+        type: string
+      client_surname:
+        example: Ivanov
+        maxLength: 100
+        minLength: 1
+        type: string
+      gender:
+        enum:
+        - male
+        - female
+        - other
+        example: male
+        type: string
+    required:
+    - address
+    - birthday
+    - client_name
+    - client_surname
+    - gender
+    type: object
+  dto.CreateProductRequest:
+    properties:
+      available_stock:
+        example: 10
+        minimum: 0
+        type: integer
+      category:
+        example: Fridges
+        maxLength: 100
+        minLength: 1
+        type: string
+      name:
+        example: Bosch KGN39
+        maxLength: 200
+        minLength: 1
+        type: string
+      price:
+        example: 49999.99
+        minimum: 0
+        type: number
+      supplier_id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+    required:
+    - category
+    - name
+    - price
+    - supplier_id
+    type: object
+  dto.CreateSupplierRequest:
+    properties:
+      address:
+        $ref: '#/definitions/dto.AddressDTO'
+      name:
+        example: Bosch
+        maxLength: 200
+        minLength: 1
+        type: string
+      phone_number:
+        example: +7-800-555-35-35
+        maxLength: 20
+        minLength: 5
+        type: string
+    required:
+    - address
+    - name
+    - phone_number
+    type: object
+  dto.DecreaseStockRequest:
+    properties:
+      amount:
+        example: 1
+        type: integer
+    required:
+    - amount
+    type: object
+  dto.ErrorResponse:
+    properties:
+      error:
+        example: invalid request body
+        type: string
+    type: object
+  dto.ImageResponse:
+    properties:
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      product_id:
+        example: 660e8400-e29b-41d4-a716-446655440000
+        type: string
+    type: object
+  dto.ProductResponse:
+    properties:
+      available_stock:
+        example: 10
+        type: integer
+      category:
+        example: Fridges
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      image_id:
+        type: string
+      last_update_date:
+        example: "2024-01-01T12:00:00Z"
+        type: string
+      name:
+        example: Bosch KGN39
+        type: string
+      price:
+        example: 49999.99
+        type: number
+      supplier_id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+    type: object
+  dto.SupplierResponse:
+    properties:
+      address:
+        $ref: '#/definitions/dto.AddressDTO'
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      name:
+        example: Bosch
+        type: string
+      phone_number:
+        example: +7-800-555-35-35
+        type: string
+    type: object
+  dto.UpdateAddressRequest:
+    properties:
+      city:
+        example: Moscow
+        maxLength: 100
+        minLength: 1
+        type: string
+      country:
+        example: Russia
+        maxLength: 100
+        minLength: 1
+        type: string
+      street:
+        example: Tverskaya 1
+        maxLength: 200
+        minLength: 1
+        type: string
+    required:
+    - city
+    - country
+    - street
+    type: object
+host: localhost:8080
+info:
+  contact:
+    name: Shop API Support
+  description: REST API магазина бытовой техники
+  termsOfService: http://swagger.io/terms/
+  title: Shop API
+  version: "1.0"
+paths:
+  /clients:
+    get:
+      description: Возвращает список клиентов. Опционально можно фильтровать по имени
+        и фамилии и использовать пагинацию.
+      parameters:
+      - description: Имя клиента
+        in: query
+        name: name
+        type: string
+      - description: Фамилия клиента
+        in: query
+        name: surname
+        type: string
+      - description: Лимит
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.ClientResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Получить список клиентов
+      tags:
+      - clients
+    post:
+      consumes:
+      - application/json
+      description: Создаёт нового клиента вместе с адресом
+      parameters:
+      - description: Данные клиента
+        in: body
+        name: client
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateClientRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ClientResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Добавить клиента
+      tags:
+      - clients
+  /clients/{id}:
+    delete:
+      parameters:
+      - description: UUID клиента
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Удалить клиента
+      tags:
+      - clients
+  /clients/{id}/address:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: UUID клиента
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Новый адрес
+        in: body
+        name: address
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateAddressRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Изменить адрес клиента
+      tags:
+      - clients
+  /images:
+    post:
+      consumes:
+      - multipart/form-data
+      description: 'Принимает multipart/form-data: product_id и файл image.'
+      parameters:
+      - description: UUID товара
+        in: formData
+        name: product_id
+        required: true
+        type: string
+      - description: Файл изображения
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ImageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Загрузить изображение для товара
+      tags:
+      - images
+  /images/{id}:
+    delete:
+      parameters:
+      - description: UUID изображения
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Удалить изображение
+      tags:
+      - images
+    get:
+      parameters:
+      - description: UUID изображения
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Получить изображение по id
+      tags:
+      - images
+    put:
+      consumes:
+      - application/octet-stream
+      description: Принимает новые байты изображения в теле запроса.
+      parameters:
+      - description: UUID изображения
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Новые байты
+        in: body
+        name: image
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Изменить изображение
+      tags:
+      - images
+  /products:
+    get:
+      parameters:
+      - description: Лимит
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.ProductResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Получить все доступные товары
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Товар
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ProductResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Добавить товар
+      tags:
+      - products
+  /products/{id}:
+    delete:
+      parameters:
+      - description: UUID товара
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Удалить товар
+      tags:
+      - products
+    get:
+      parameters:
+      - description: UUID товара
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ProductResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Получить товар по id
+      tags:
+      - products
+  /products/{id}/image:
+    get:
+      parameters:
+      - description: UUID товара
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Получить изображение товара
+      tags:
+      - images
+  /products/{id}/stock:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: UUID товара
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Сколько вычесть
+        in: body
+        name: amount
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DecreaseStockRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Уменьшить количество товара
+      tags:
+      - products
+  /suppliers:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.SupplierResponse'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Получить всех поставщиков
+      tags:
+      - suppliers
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Поставщик
+        in: body
+        name: supplier
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateSupplierRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.SupplierResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Добавить поставщика
+      tags:
+      - suppliers
+  /suppliers/{id}:
+    delete:
+      parameters:
+      - description: UUID поставщика
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Удалить поставщика
+      tags:
+      - suppliers
+    get:
+      parameters:
+      - description: UUID поставщика
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SupplierResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Получить поставщика по id
+      tags:
+      - suppliers
+  /suppliers/{id}/address:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: UUID поставщика
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Новый адрес
+        in: body
+        name: address
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateAddressRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Изменить адрес поставщика
+      tags:
+      - suppliers
+schemes:
+- http
+swagger: "2.0"
