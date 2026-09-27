@@ -21,15 +21,15 @@ func NewImageHandler(repo repository.ImageRepository) *ImageHandler {
 
 // UploadImage godoc
 // @Summary      Загрузить изображение для товара
-// @Description  Принимает multipart/form-data: product_id и файл image.
+// @Description  Принимает multipart/form-data: product_id (UUID) и файл image.
 // @Tags         images
 // @Accept       multipart/form-data
 // @Produce      json
 // @Param        product_id formData string true "UUID товара"
 // @Param        image      formData file   true "Файл изображения"
-// @Success      201 {object} dto.ImageResponse
-// @Failure      400 {object} dto.ErrorResponse
-// @Failure      404 {object} dto.ErrorResponse
+// @Success      201 {object} dto.ImageResponse "Изображение загружено"
+// @Failure      400 {object} dto.ErrorResponse "Некорректный product_id или пустое изображение"
+// @Failure      404 {object} dto.ErrorResponse "Товар не найден"
 // @Router       /images [post]
 func (h *ImageHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(20 << 20); err != nil {
@@ -67,12 +67,13 @@ func (h *ImageHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
 
 // GetImage godoc
 // @Summary      Получить изображение по id
+// @Description  Возвращает бинарный поток изображения. Файл скачивается автоматически.
 // @Tags         images
 // @Produce      application/octet-stream
 // @Param        id path string true "UUID изображения"
-// @Success      200 {string} binary
-// @Failure      400 {object} dto.ErrorResponse
-// @Failure      404 {object} dto.ErrorResponse
+// @Success      200 {string} string "Бинарные данные изображения"
+// @Failure      400 {object} dto.ErrorResponse "Некорректный UUID"
+// @Failure      404 {object} dto.ErrorResponse "Изображение не найдено"
 // @Router       /images/{id} [get]
 func (h *ImageHandler) GetImage(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(mux.Vars(r)["id"])
@@ -90,12 +91,13 @@ func (h *ImageHandler) GetImage(w http.ResponseWriter, r *http.Request) {
 
 // GetProductImage godoc
 // @Summary      Получить изображение товара
+// @Description  Возвращает бинарный поток изображения, привязанного к товару. Файл скачивается автоматически.
 // @Tags         images
 // @Produce      application/octet-stream
 // @Param        id path string true "UUID товара"
-// @Success      200 {string} binary
-// @Failure      400 {object} dto.ErrorResponse
-// @Failure      404 {object} dto.ErrorResponse
+// @Success      200 {string} string "Бинарные данные изображения"
+// @Failure      400 {object} dto.ErrorResponse "Некорректный UUID"
+// @Failure      404 {object} dto.ErrorResponse "Изображение не найдено"
 // @Router       /products/{id}/image [get]
 func (h *ImageHandler) GetProductImage(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(mux.Vars(r)["id"])
@@ -113,15 +115,15 @@ func (h *ImageHandler) GetProductImage(w http.ResponseWriter, r *http.Request) {
 
 // UpdateImage godoc
 // @Summary      Изменить изображение
-// @Description  Принимает новые байты изображения в теле запроса.
+// @Description  Заменяет байты изображения по его id.
 // @Tags         images
 // @Accept       application/octet-stream
 // @Produce      json
 // @Param        id    path string true "UUID изображения"
-// @Param        image body []byte true "Новые байты"
-// @Success      200 {object} dto.ErrorResponse
-// @Failure      400 {object} dto.ErrorResponse
-// @Failure      404 {object} dto.ErrorResponse
+// @Param        image body   []byte true "Новые байты изображения"
+// @Success      200 {object} dto.ErrorResponse "Изображение обновлено"
+// @Failure      400 {object} dto.ErrorResponse "Некорректный UUID или пустое тело"
+// @Failure      404 {object} dto.ErrorResponse "Изображение не найдено"
 // @Router       /images/{id} [put]
 func (h *ImageHandler) UpdateImage(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(mux.Vars(r)["id"])
@@ -145,9 +147,9 @@ func (h *ImageHandler) UpdateImage(w http.ResponseWriter, r *http.Request) {
 // @Summary      Удалить изображение
 // @Tags         images
 // @Param        id path string true "UUID изображения"
-// @Success      204
-// @Failure      400 {object} dto.ErrorResponse
-// @Failure      404 {object} dto.ErrorResponse
+// @Success      204 "Изображение удалено"
+// @Failure      400 {object} dto.ErrorResponse "Некорректный UUID"
+// @Failure      404 {object} dto.ErrorResponse "Изображение не найдено"
 // @Router       /images/{id} [delete]
 func (h *ImageHandler) DeleteImage(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(mux.Vars(r)["id"])

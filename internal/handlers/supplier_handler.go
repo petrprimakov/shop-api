@@ -22,13 +22,14 @@ func NewSupplierHandler(repo repository.SupplierRepository) *SupplierHandler {
 
 // CreateSupplier godoc
 // @Summary      Добавить поставщика
+// @Description  Создаёт поставщика вместе с адресом.
 // @Tags         suppliers
 // @Accept       json
 // @Produce      json
 // @Param        supplier body dto.CreateSupplierRequest true "Поставщик"
-// @Success      201 {object} dto.SupplierResponse
-// @Failure      400 {object} dto.ErrorResponse
-// @Failure      500 {object} dto.ErrorResponse
+// @Success      201 {object} dto.SupplierResponse "Поставщик создан"
+// @Failure      400 {object} dto.ErrorResponse    "Некорректное тело запроса или ошибка валидации"
+// @Failure      500 {object} dto.ErrorResponse    "Внутренняя ошибка сервера"
 // @Router       /suppliers [post]
 func (h *SupplierHandler) CreateSupplier(w http.ResponseWriter, r *http.Request) {
 	var req dto.CreateSupplierRequest
@@ -51,8 +52,8 @@ func (h *SupplierHandler) CreateSupplier(w http.ResponseWriter, r *http.Request)
 // @Summary      Получить всех поставщиков
 // @Tags         suppliers
 // @Produce      json
-// @Success      200 {array} dto.SupplierResponse
-// @Failure      500 {object} dto.ErrorResponse
+// @Success      200 {array}  dto.SupplierResponse "Список поставщиков (пустой массив, если ничего нет)"
+// @Failure      500 {object} dto.ErrorResponse    "Внутренняя ошибка сервера"
 // @Router       /suppliers [get]
 func (h *SupplierHandler) ListSuppliers(w http.ResponseWriter, r *http.Request) {
 	items, err := h.repo.List(r.Context())
@@ -72,9 +73,9 @@ func (h *SupplierHandler) ListSuppliers(w http.ResponseWriter, r *http.Request) 
 // @Tags         suppliers
 // @Produce      json
 // @Param        id path string true "UUID поставщика"
-// @Success      200 {object} dto.SupplierResponse
-// @Failure      400 {object} dto.ErrorResponse
-// @Failure      404 {object} dto.ErrorResponse
+// @Success      200 {object} dto.SupplierResponse "Поставщик найден"
+// @Failure      400 {object} dto.ErrorResponse    "Некорректный UUID"
+// @Failure      404 {object} dto.ErrorResponse    "Поставщик не найден"
 // @Router       /suppliers/{id} [get]
 func (h *SupplierHandler) GetSupplier(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(mux.Vars(r)["id"])
@@ -92,11 +93,12 @@ func (h *SupplierHandler) GetSupplier(w http.ResponseWriter, r *http.Request) {
 
 // DeleteSupplier godoc
 // @Summary      Удалить поставщика
+// @Description  Удаляет поставщика и его адрес. Если на поставщика ссылаются товары — операция завершится ошибкой 500.
 // @Tags         suppliers
 // @Param        id path string true "UUID поставщика"
-// @Success      204
-// @Failure      400 {object} dto.ErrorResponse
-// @Failure      404 {object} dto.ErrorResponse
+// @Success      204 "Поставщик удалён"
+// @Failure      400 {object} dto.ErrorResponse "Некорректный UUID"
+// @Failure      404 {object} dto.ErrorResponse "Поставщик не найден"
 // @Router       /suppliers/{id} [delete]
 func (h *SupplierHandler) DeleteSupplier(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(mux.Vars(r)["id"])
@@ -113,14 +115,15 @@ func (h *SupplierHandler) DeleteSupplier(w http.ResponseWriter, r *http.Request)
 
 // UpdateSupplierAddress godoc
 // @Summary      Изменить адрес поставщика
+// @Description  Заменяет адрес поставщика на новый.
 // @Tags         suppliers
 // @Accept       json
 // @Produce      json
 // @Param        id      path string                   true "UUID поставщика"
 // @Param        address body dto.UpdateAddressRequest true "Новый адрес"
-// @Success      200 {object} dto.ErrorResponse
-// @Failure      400 {object} dto.ErrorResponse
-// @Failure      404 {object} dto.ErrorResponse
+// @Success      200 {object} dto.ErrorResponse "Адрес обновлён"
+// @Failure      400 {object} dto.ErrorResponse "Некорректный UUID или тело запроса"
+// @Failure      404 {object} dto.ErrorResponse "Поставщик не найден"
 // @Router       /suppliers/{id}/address [patch]
 func (h *SupplierHandler) UpdateSupplierAddress(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(mux.Vars(r)["id"])

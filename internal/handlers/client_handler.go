@@ -23,14 +23,14 @@ func NewClientHandler(repo repository.ClientRepository) *ClientHandler {
 
 // CreateClient godoc
 // @Summary      Добавить клиента
-// @Description  Создаёт нового клиента вместе с адресом
+// @Description  Создаёт нового клиента вместе с адресом.
 // @Tags         clients
 // @Accept       json
 // @Produce      json
 // @Param        client body dto.CreateClientRequest true "Данные клиента"
-// @Success      201 {object} dto.ClientResponse
-// @Failure      400 {object} dto.ErrorResponse
-// @Failure      500 {object} dto.ErrorResponse
+// @Success      201 {object} dto.ClientResponse "Клиент создан"
+// @Failure      400 {object} dto.ErrorResponse "Некорректное тело запроса или ошибка валидации"
+// @Failure      500 {object} dto.ErrorResponse "Внутренняя ошибка сервера"
 // @Router       /clients [post]
 func (h *ClientHandler) CreateClient(w http.ResponseWriter, r *http.Request) {
 	var req dto.CreateClientRequest
@@ -63,15 +63,15 @@ func (h *ClientHandler) CreateClient(w http.ResponseWriter, r *http.Request) {
 
 // ListClients godoc
 // @Summary      Получить список клиентов
-// @Description  Возвращает список клиентов. Опционально можно фильтровать по имени и фамилии и использовать пагинацию.
+// @Description  Возвращает список клиентов. Опционально фильтруется по имени и фамилии и поддерживает пагинацию.
 // @Tags         clients
 // @Produce      json
 // @Param        name    query string false "Имя клиента"
 // @Param        surname query string false "Фамилия клиента"
 // @Param        limit   query int    false "Лимит"
 // @Param        offset  query int    false "Смещение"
-// @Success      200 {array} dto.ClientResponse
-// @Failure      500 {object} dto.ErrorResponse
+// @Success      200 {array}  dto.ClientResponse "Список клиентов (пустой массив, если ничего не найдено)"
+// @Failure      500 {object} dto.ErrorResponse  "Внутренняя ошибка сервера"
 // @Router       /clients [get]
 func (h *ClientHandler) ListClients(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
@@ -93,11 +93,12 @@ func (h *ClientHandler) ListClients(w http.ResponseWriter, r *http.Request) {
 
 // DeleteClient godoc
 // @Summary      Удалить клиента
+// @Description  Удаляет клиента и связанный с ним адрес.
 // @Tags         clients
 // @Param        id path string true "UUID клиента"
-// @Success      204
-// @Failure      400 {object} dto.ErrorResponse
-// @Failure      404 {object} dto.ErrorResponse
+// @Success      204 "Клиент удалён"
+// @Failure      400 {object} dto.ErrorResponse "Некорректный UUID"
+// @Failure      404 {object} dto.ErrorResponse "Клиент не найден"
 // @Router       /clients/{id} [delete]
 func (h *ClientHandler) DeleteClient(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(mux.Vars(r)["id"])
@@ -114,14 +115,15 @@ func (h *ClientHandler) DeleteClient(w http.ResponseWriter, r *http.Request) {
 
 // UpdateClientAddress godoc
 // @Summary      Изменить адрес клиента
+// @Description  Заменяет адрес клиента на новый.
 // @Tags         clients
 // @Accept       json
 // @Produce      json
-// @Param        id      path string                  true "UUID клиента"
+// @Param        id      path string                   true "UUID клиента"
 // @Param        address body dto.UpdateAddressRequest true "Новый адрес"
-// @Success      200 {object} dto.ErrorResponse
-// @Failure      400 {object} dto.ErrorResponse
-// @Failure      404 {object} dto.ErrorResponse
+// @Success      200 {object} dto.ErrorResponse "Адрес обновлён"
+// @Failure      400 {object} dto.ErrorResponse "Некорректный UUID или тело запроса"
+// @Failure      404 {object} dto.ErrorResponse "Клиент не найден"
 // @Router       /clients/{id}/address [patch]
 func (h *ClientHandler) UpdateClientAddress(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(mux.Vars(r)["id"])

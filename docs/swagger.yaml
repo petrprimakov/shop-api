@@ -3,16 +3,19 @@ definitions:
   dto.AddressDTO:
     properties:
       city:
+        description: Город
         example: Moscow
         maxLength: 100
         minLength: 1
         type: string
       country:
+        description: Страна
         example: Russia
         maxLength: 100
         minLength: 1
         type: string
       street:
+        description: Улица и номер дома
         example: Tverskaya 1
         maxLength: 200
         minLength: 1
@@ -25,44 +28,58 @@ definitions:
   dto.ClientResponse:
     properties:
       address:
-        $ref: '#/definitions/dto.AddressDTO'
+        allOf:
+        - $ref: '#/definitions/dto.AddressDTO'
+        description: Адрес клиента
       birthday:
+        description: Дата рождения в формате YYYY-MM-DD
         example: "1990-05-15"
         type: string
       client_name:
+        description: Имя клиента
         example: Ivan
         type: string
       client_surname:
+        description: Фамилия клиента
         example: Ivanov
         type: string
       gender:
+        description: Пол
         example: male
         type: string
       id:
+        description: Уникальный идентификатор клиента
         example: 550e8400-e29b-41d4-a716-446655440000
         type: string
       registration_date:
+        description: Дата регистрации в формате RFC3339
         example: "2024-01-01T12:00:00Z"
         type: string
     type: object
   dto.CreateClientRequest:
     properties:
       address:
-        $ref: '#/definitions/dto.AddressDTO'
+        allOf:
+        - $ref: '#/definitions/dto.AddressDTO'
+        description: Адрес клиента
       birthday:
+        description: Дата рождения в формате YYYY-MM-DD
         example: "1990-05-15"
         type: string
       client_name:
+        description: Имя клиента
         example: Ivan
         maxLength: 100
         minLength: 1
         type: string
       client_surname:
+        description: Фамилия клиента
         example: Ivanov
         maxLength: 100
         minLength: 1
         type: string
       gender:
+        description: 'Пол: male, female или other'
         enum:
         - male
         - female
@@ -79,24 +96,29 @@ definitions:
   dto.CreateProductRequest:
     properties:
       available_stock:
+        description: Количество на складе
         example: 10
         minimum: 0
         type: integer
       category:
+        description: Название категории (если её нет, будет создана)
         example: Fridges
         maxLength: 100
         minLength: 1
         type: string
       name:
+        description: Название товара
         example: Bosch KGN39
         maxLength: 200
         minLength: 1
         type: string
       price:
+        description: Цена
         example: 49999.99
         minimum: 0
         type: number
       supplier_id:
+        description: UUID поставщика
         example: 550e8400-e29b-41d4-a716-446655440000
         type: string
     required:
@@ -108,13 +130,17 @@ definitions:
   dto.CreateSupplierRequest:
     properties:
       address:
-        $ref: '#/definitions/dto.AddressDTO'
+        allOf:
+        - $ref: '#/definitions/dto.AddressDTO'
+        description: Адрес поставщика
       name:
+        description: Название поставщика
         example: Bosch
         maxLength: 200
         minLength: 1
         type: string
       phone_number:
+        description: Телефон
         example: +7-800-555-35-35
         maxLength: 20
         minLength: 5
@@ -127,6 +153,7 @@ definitions:
   dto.DecreaseStockRequest:
     properties:
       amount:
+        description: На сколько уменьшить остаток
         example: 1
         type: integer
     required:
@@ -135,71 +162,90 @@ definitions:
   dto.ErrorResponse:
     properties:
       error:
+        description: Текст ошибки
         example: invalid request body
         type: string
     type: object
   dto.ImageResponse:
     properties:
       id:
+        description: UUID изображения
         example: 550e8400-e29b-41d4-a716-446655440000
         type: string
       product_id:
+        description: UUID товара, к которому привязано изображение
         example: 660e8400-e29b-41d4-a716-446655440000
         type: string
     type: object
   dto.ProductResponse:
     properties:
       available_stock:
+        description: Количество на складе
         example: 10
         type: integer
       category:
+        description: Категория
         example: Fridges
         type: string
       id:
+        description: Уникальный идентификатор товара
         example: 550e8400-e29b-41d4-a716-446655440000
         type: string
       image_id:
+        description: UUID изображения (может отсутствовать)
         type: string
       last_update_date:
+        description: Дата последнего изменения остатка в формате RFC3339
         example: "2024-01-01T12:00:00Z"
         type: string
       name:
+        description: Название товара
         example: Bosch KGN39
         type: string
       price:
+        description: Цена
         example: 49999.99
         type: number
       supplier_id:
+        description: UUID поставщика
         example: 550e8400-e29b-41d4-a716-446655440000
         type: string
     type: object
   dto.SupplierResponse:
     properties:
       address:
-        $ref: '#/definitions/dto.AddressDTO'
+        allOf:
+        - $ref: '#/definitions/dto.AddressDTO'
+        description: Адрес поставщика
       id:
+        description: Уникальный идентификатор поставщика
         example: 550e8400-e29b-41d4-a716-446655440000
         type: string
       name:
+        description: Название поставщика
         example: Bosch
         type: string
       phone_number:
+        description: Телефон
         example: +7-800-555-35-35
         type: string
     type: object
   dto.UpdateAddressRequest:
     properties:
       city:
+        description: Город
         example: Moscow
         maxLength: 100
         minLength: 1
         type: string
       country:
+        description: Страна
         example: Russia
         maxLength: 100
         minLength: 1
         type: string
       street:
+        description: Улица и номер дома
         example: Tverskaya 1
         maxLength: 200
         minLength: 1
@@ -220,8 +266,8 @@ info:
 paths:
   /clients:
     get:
-      description: Возвращает список клиентов. Опционально можно фильтровать по имени
-        и фамилии и использовать пагинацию.
+      description: Возвращает список клиентов. Опционально фильтруется по имени и
+        фамилии и поддерживает пагинацию.
       parameters:
       - description: Имя клиента
         in: query
@@ -243,13 +289,13 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Список клиентов (пустой массив, если ничего не найдено)
           schema:
             items:
               $ref: '#/definitions/dto.ClientResponse'
             type: array
         "500":
-          description: Internal Server Error
+          description: Внутренняя ошибка сервера
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Получить список клиентов
@@ -258,7 +304,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Создаёт нового клиента вместе с адресом
+      description: Создаёт нового клиента вместе с адресом.
       parameters:
       - description: Данные клиента
         in: body
@@ -270,15 +316,15 @@ paths:
       - application/json
       responses:
         "201":
-          description: Created
+          description: Клиент создан
           schema:
             $ref: '#/definitions/dto.ClientResponse'
         "400":
-          description: Bad Request
+          description: Некорректное тело запроса или ошибка валидации
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: Внутренняя ошибка сервера
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Добавить клиента
@@ -286,6 +332,7 @@ paths:
       - clients
   /clients/{id}:
     delete:
+      description: Удаляет клиента и связанный с ним адрес.
       parameters:
       - description: UUID клиента
         in: path
@@ -294,13 +341,13 @@ paths:
         type: string
       responses:
         "204":
-          description: No Content
+          description: Клиент удалён
         "400":
-          description: Bad Request
+          description: Некорректный UUID
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: Not Found
+          description: Клиент не найден
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Удалить клиента
@@ -310,6 +357,7 @@ paths:
     patch:
       consumes:
       - application/json
+      description: Заменяет адрес клиента на новый.
       parameters:
       - description: UUID клиента
         in: path
@@ -326,15 +374,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Адрес обновлён
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "400":
-          description: Bad Request
+          description: Некорректный UUID или тело запроса
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: Not Found
+          description: Клиент не найден
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Изменить адрес клиента
@@ -344,7 +392,7 @@ paths:
     post:
       consumes:
       - multipart/form-data
-      description: 'Принимает multipart/form-data: product_id и файл image.'
+      description: 'Принимает multipart/form-data: product_id (UUID) и файл image.'
       parameters:
       - description: UUID товара
         in: formData
@@ -360,15 +408,15 @@ paths:
       - application/json
       responses:
         "201":
-          description: Created
+          description: Изображение загружено
           schema:
             $ref: '#/definitions/dto.ImageResponse'
         "400":
-          description: Bad Request
+          description: Некорректный product_id или пустое изображение
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: Not Found
+          description: Товар не найден
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Загрузить изображение для товара
@@ -384,19 +432,20 @@ paths:
         type: string
       responses:
         "204":
-          description: No Content
+          description: Изображение удалено
         "400":
-          description: Bad Request
+          description: Некорректный UUID
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: Not Found
+          description: Изображение не найдено
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Удалить изображение
       tags:
       - images
     get:
+      description: Возвращает бинарный поток изображения. Файл скачивается автоматически.
       parameters:
       - description: UUID изображения
         in: path
@@ -407,15 +456,15 @@ paths:
       - application/octet-stream
       responses:
         "200":
-          description: OK
+          description: Бинарные данные изображения
           schema:
             type: string
         "400":
-          description: Bad Request
+          description: Некорректный UUID
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: Not Found
+          description: Изображение не найдено
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Получить изображение по id
@@ -424,14 +473,14 @@ paths:
     put:
       consumes:
       - application/octet-stream
-      description: Принимает новые байты изображения в теле запроса.
+      description: Заменяет байты изображения по его id.
       parameters:
       - description: UUID изображения
         in: path
         name: id
         required: true
         type: string
-      - description: Новые байты
+      - description: Новые байты изображения
         in: body
         name: image
         required: true
@@ -443,15 +492,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Изображение обновлено
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "400":
-          description: Bad Request
+          description: Некорректный UUID или пустое тело
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: Not Found
+          description: Изображение не найдено
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Изменить изображение
@@ -459,6 +508,7 @@ paths:
       - images
   /products:
     get:
+      description: Возвращает товары с available_stock > 0. Поддерживает пагинацию.
       parameters:
       - description: Лимит
         in: query
@@ -472,13 +522,13 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Список товаров (пустой массив, если нет доступных)
           schema:
             items:
               $ref: '#/definitions/dto.ProductResponse'
             type: array
         "500":
-          description: Internal Server Error
+          description: Внутренняя ошибка сервера
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Получить все доступные товары
@@ -487,6 +537,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: Создаёт товар. Если категории с таким именем нет — она создаётся.
       parameters:
       - description: Товар
         in: body
@@ -498,15 +549,15 @@ paths:
       - application/json
       responses:
         "201":
-          description: Created
+          description: Товар создан
           schema:
             $ref: '#/definitions/dto.ProductResponse'
         "400":
-          description: Bad Request
+          description: Некорректное тело запроса или ошибка валидации
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: Внутренняя ошибка сервера
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Добавить товар
@@ -522,13 +573,13 @@ paths:
         type: string
       responses:
         "204":
-          description: No Content
+          description: Товар удалён
         "400":
-          description: Bad Request
+          description: Некорректный UUID
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: Not Found
+          description: Товар не найден
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Удалить товар
@@ -545,15 +596,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Товар найден
           schema:
             $ref: '#/definitions/dto.ProductResponse'
         "400":
-          description: Bad Request
+          description: Некорректный UUID
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: Not Found
+          description: Товар не найден
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Получить товар по id
@@ -561,6 +612,8 @@ paths:
       - products
   /products/{id}/image:
     get:
+      description: Возвращает бинарный поток изображения, привязанного к товару. Файл
+        скачивается автоматически.
       parameters:
       - description: UUID товара
         in: path
@@ -571,15 +624,15 @@ paths:
       - application/octet-stream
       responses:
         "200":
-          description: OK
+          description: Бинарные данные изображения
           schema:
             type: string
         "400":
-          description: Bad Request
+          description: Некорректный UUID
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: Not Found
+          description: Изображение не найдено
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Получить изображение товара
@@ -589,6 +642,8 @@ paths:
     patch:
       consumes:
       - application/json
+      description: Уменьшает available_stock на указанное число. Возвращает 400, если
+        товара недостаточно.
       parameters:
       - description: UUID товара
         in: path
@@ -605,15 +660,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Остаток обновлён
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "400":
-          description: Bad Request
+          description: Недостаточно товара, некорректный UUID или тело
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: Not Found
+          description: Товар не найден
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Уменьшить количество товара
@@ -625,13 +680,13 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Список поставщиков (пустой массив, если ничего нет)
           schema:
             items:
               $ref: '#/definitions/dto.SupplierResponse'
             type: array
         "500":
-          description: Internal Server Error
+          description: Внутренняя ошибка сервера
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Получить всех поставщиков
@@ -640,6 +695,7 @@ paths:
     post:
       consumes:
       - application/json
+      description: Создаёт поставщика вместе с адресом.
       parameters:
       - description: Поставщик
         in: body
@@ -651,15 +707,15 @@ paths:
       - application/json
       responses:
         "201":
-          description: Created
+          description: Поставщик создан
           schema:
             $ref: '#/definitions/dto.SupplierResponse'
         "400":
-          description: Bad Request
+          description: Некорректное тело запроса или ошибка валидации
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: Внутренняя ошибка сервера
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Добавить поставщика
@@ -667,6 +723,8 @@ paths:
       - suppliers
   /suppliers/{id}:
     delete:
+      description: Удаляет поставщика и его адрес. Если на поставщика ссылаются товары
+        — операция завершится ошибкой 500.
       parameters:
       - description: UUID поставщика
         in: path
@@ -675,13 +733,13 @@ paths:
         type: string
       responses:
         "204":
-          description: No Content
+          description: Поставщик удалён
         "400":
-          description: Bad Request
+          description: Некорректный UUID
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: Not Found
+          description: Поставщик не найден
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Удалить поставщика
@@ -698,15 +756,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Поставщик найден
           schema:
             $ref: '#/definitions/dto.SupplierResponse'
         "400":
-          description: Bad Request
+          description: Некорректный UUID
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: Not Found
+          description: Поставщик не найден
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Получить поставщика по id
@@ -716,6 +774,7 @@ paths:
     patch:
       consumes:
       - application/json
+      description: Заменяет адрес поставщика на новый.
       parameters:
       - description: UUID поставщика
         in: path
@@ -732,15 +791,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Адрес обновлён
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "400":
-          description: Bad Request
+          description: Некорректный UUID или тело запроса
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
         "404":
-          description: Not Found
+          description: Поставщик не найден
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Изменить адрес поставщика
